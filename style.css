@@ -1,0 +1,200 @@
+@charset "utf-8";
+
+/* ===============================================
+   基本設定・タイポグラフィ
+   =============================================== */
+/* フェードイン（高速化: 1.2s -> 0.8s） */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* 優雅な出現（高速化: 1.5s -> 1.0s） */
+@keyframes elegantFadeIn { 
+    from { opacity: 0; transform: translateY(20px); filter: blur(2px); } 
+    to { opacity: 1; transform: translateY(0); filter: blur(0); } 
+}
+
+/* ギャラリー点滅（高速化: 3.0s -> 1.5s） */
+@keyframes lightUpBlink { 
+    0% { opacity: 0; transform: translateY(20px); } 
+    10% { opacity: 0.05; } 
+    25% { opacity: 0.5; transform: translateY(15px); } 
+    40% { opacity: 0.1; transform: translateY(10px); } 
+    60% { opacity: 0.8; transform: translateY(5px); } 
+    80% { opacity: 0.6; } 
+    100% { opacity: 1; transform: translateY(0); } 
+}
+
+body {
+    font-family: 'Montserrat', "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    color: #E0E0E0; background-color: #000000; margin: 0; padding: 0; line-height: 1.8; letter-spacing: 0.05em;
+    scroll-behavior: smooth; opacity: 0; 
+    animation: fadeIn 0.8s ease-out forwards; /* 高速化 */
+}
+
+header { text-align: center; padding: 60px 20px 30px; background-color: #000000; }
+.header-logo { max-width: 350px; width: 80%; height: auto; margin: 0 auto; display: block; opacity: 0; animation: elegantFadeIn 1.0s ease-out forwards; animation-delay: 0.2s; }
+
+/* 共通ボタンデザイン (.detail-button) 
+   - View Toggle と About Read More で共通化 */
+.detail-button {
+    background: transparent; 
+    border: 1px solid #555; 
+    color: #fff; 
+    padding: 10px 30px; /* サイズ統一 */
+    font-size: 0.85rem; 
+    letter-spacing: 0.1em;
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center;
+    font-family: inherit;
+    min-width: 140px; /* 幅を揃える */
+}
+.detail-button:hover { background: #fff; color: #000; border-color: #fff; }
+.minimalist-icon { margin-left: 10px; font-size: 0.8rem; transition: transform 0.3s; }
+/* Aboutの矢印アニメーション */
+.detail-button:hover .minimalist-icon.fa-chevron-right { transform: translateX(5px); }
+#toggle-about-btn[aria-expanded="true"] .minimalist-icon { transform: rotate(-90deg); }
+
+
+/* ギャラリー切り替えボタンエリア */
+.view-toggle-area {
+    text-align: center; margin-top: 0; margin-bottom: 80px; opacity: 0; 
+    animation: elegantFadeIn 1.0s ease-out forwards; animation-delay: 0.5s; /* 高速化 */
+}
+
+/* ===============================================
+   Gallery Section
+   =============================================== */
+.gallery-container {
+    width: 90%; max-width: 1200px; margin: 0 auto 30px; padding: 20px 0; transition: all 0.5s ease-in-out;
+}
+.gallery-row { transition: margin-bottom 0.5s ease-in-out; }
+.gallery-item {
+    position: relative; overflow: hidden; cursor: pointer; box-sizing: border-box; z-index: 5; opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), width 0.5s ease-in-out, padding-bottom 0.5s ease-in-out, margin 0.5s ease-in-out;
+}
+/* アニメーション時間短縮 */
+.gallery-item.is-visible { animation: lightUpBlink 1.5s ease-out forwards; animation-delay: var(--item-delay, 0s); }
+.gallery-item img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.4s ease, transform 0.5s ease; }
+.gallery-item:hover { transform: scale(1.05); z-index: 10; }
+.gallery-item:hover img { filter: brightness(1.3); }
+
+/* --- TREE VIEW --- */
+.gallery-container.tree-view { display: flex; flex-direction: column; align-items: center; }
+.gallery-container.tree-view .gallery-row { display: flex; justify-content: center; width: 100%; margin-bottom: 5px; }
+.gallery-container.tree-view .gallery-item { margin: 0 2px; }
+.gallery-container.tree-view .gallery-row[data-row="5"] .gallery-item { width: 2.40%; padding-bottom: 2.40%; }
+.gallery-container.tree-view .gallery-row[data-row="4"] .gallery-item { width: 3.64%; padding-bottom: 3.64%; }
+.gallery-container.tree-view .gallery-row[data-row="3"] .gallery-item { width: 5.87%; padding-bottom: 5.87%; }
+.gallery-container.tree-view .gallery-row[data-row="2"] .gallery-item { width: 9.77%; padding-bottom: 9.77%; }
+.gallery-container.tree-view .gallery-row[data-row="1"] .gallery-item { width: 14.28%; padding-bottom: 14.28%; }
+
+/* --- GRID VIEW --- */
+.gallery-container.grid-view { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.gallery-container.grid-view .gallery-row { display: contents; }
+.gallery-container.grid-view .gallery-item { width: 100%; padding-bottom: 100%; margin: 0; }
+
+
+/* ===============================================
+   Modal (Simple Image Only) - バツボタン修正版
+   =============================================== */
+.modal {
+    display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.98); opacity: 0; transition: opacity 0.3s ease; /* 高速化 */
+    backdrop-filter: blur(5px);
+}
+.modal.is-open { opacity: 1; }
+
+#modal .modal-content {
+    background-color: transparent; width: 100%; height: 100%; position: relative;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* 閉じるボタン (CSSのみで描画) */
+.close-btn {
+    position: fixed; top: 25px; right: 25px; z-index: 2002; cursor: pointer; width: 44px; height: 44px;
+    transition: transform 0.3s ease; background: rgba(0,0,0,0.5); border-radius: 50%;
+    /* HTMLの&times;を削除したので、CSSで線を描く */
+}
+.close-btn::before, .close-btn::after {
+    content: ''; position: absolute; top: 50%; left: 50%; width: 24px; height: 2px; background: #fff;
+    border-radius: 2px;
+}
+.close-btn::before { transform: translate(-50%, -50%) rotate(45deg); }
+.close-btn::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.close-btn:hover { transform: rotate(90deg) scale(1.1); background: rgba(0,0,0,0.8); }
+
+/* 画像エリア */
+#modal .main-image-area { position: relative; max-width: 90%; max-height: 90%; }
+#modal .main-image-area img { max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain; border: 1px solid #333; display: block; }
+
+/* 拡大アイコン */
+.enlarge-icon {
+    position: absolute; bottom: 15px; right: 15px; color: #fff; background: rgba(0, 0, 0, 0.6);
+    padding: 10px; border-radius: 4px; font-size: 1rem; line-height: 1; transition: background 0.3s;
+}
+.enlarge-icon:hover { background: rgba(50, 50, 50, 0.9); }
+
+
+/* ===============================================
+   Other Sections
+   =============================================== */
+.info-section { width: 100%; max-width: 1000px; margin: 120px auto; padding: 0 5%; box-sizing: border-box; }
+.section-title {
+    font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-weight: 600; text-align: center; letter-spacing: 0.1em;
+    color: #fff; margin-bottom: 60px; position: relative; padding-bottom: 15px; opacity: 0;
+}
+.section-title::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 1px; background: #666; }
+.section-title.is-revealed-text, .info-content-p.is-revealed-text, .info-content-dl.is-revealed-text, .button-area.is-revealed-text {
+    animation: elegantFadeIn 1.0s ease-out forwards; animation-delay: var(--text-delay, 0s); /* 高速化 */
+}
+
+/* Process Section */
+.process-gallery { display: flex; flex-direction: column; gap: 120px; position: relative; padding: 20px 0; }
+.process-gallery::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: linear-gradient(to bottom, transparent, #444 10%, #444 90%, transparent); transform: translateX(-50%); z-index: 0; }
+.process-item { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
+.process-item::after { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; background-color: #000; border: 1px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+.process-item:nth-child(even) { flex-direction: row-reverse; }
+.process-images { width: 45%; display: flex; gap: 10px; opacity: 0; }
+.process-images img { flex: 1; width: 100%; height: auto; object-fit: cover; border: 1px solid #333; filter: brightness(0.8); transition: filter 0.3s ease; }
+.process-caption { width: 45%; font-size: 0.9rem; color: #ccc; line-height: 1.9; margin: 0; padding: 0 40px; box-sizing: border-box; opacity: 0; }
+.process-item:nth-child(odd) .process-caption { text-align: left; padding-left: 60px; padding-right: 0; }
+.process-item:nth-child(even) .process-caption { text-align: right; padding-right: 60px; padding-left: 0; }
+.process-item .process-images.is-revealed-process { animation: elegantFadeIn 1.0s ease-out forwards; animation-delay: var(--process-delay, 0s); }
+.process-item .process-caption.is-revealed-process { animation: elegantFadeIn 1.0s ease-out forwards; animation-delay: var(--process-delay-text, 0s); }
+
+/* About & Credit */
+.about-content-preview, .about-content-hidden { font-size: 0.95rem; line-height: 2.2; }
+.about-content-hidden { height: 0; overflow: hidden; opacity: 0; transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease; /* 高速化 */ }
+.about-content-hidden.is-expanded { opacity: 1; }
+.button-area { text-align: center; margin-top: 50px; opacity: 0; }
+.credit-content dl { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid #333; border-bottom: 1px solid #333; padding: 40px 0; opacity: 0; }
+.credit-content dt { text-align: right; font-weight: 700; color: #fff; padding-right: 20px; }
+.credit-content dd { text-align: left; margin: 0; color: #aaa; font-weight: 300; }
+
+/* Footer */
+footer { text-align: center; padding: 60px 0; margin-top: 80px; opacity: 0; animation: elegantFadeIn 1.0s ease-out forwards; animation-delay: 0.5s; }
+.footer-nav a { color: #666; text-decoration: none; margin: 0 15px; font-size: 0.8rem; letter-spacing: 0.1em; transition: color 0.3s; }
+.footer-nav a:hover { color: #fff; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    body { font-size: 14px; }
+    .section-title { font-size: 1.8rem; margin-bottom: 40px; }
+    /* Tree View Mobile */
+    .gallery-container.tree-view .gallery-row[data-row="5"] .gallery-item { width: 4.5%; padding-bottom: 4.5%; }
+    .gallery-container.tree-view .gallery-row[data-row="4"] .gallery-item { width: 6.5%; padding-bottom: 6.5%; }
+    .gallery-container.tree-view .gallery-row[data-row="3"] .gallery-item { width: 10%; padding-bottom: 10%; }
+    .gallery-container.tree-view .gallery-row[data-row="2"] .gallery-item { width: 15%; padding-bottom: 15%; }
+    .gallery-container.tree-view .gallery-row[data-row="1"] .gallery-item { width: 22%; padding-bottom: 22%; }
+    /* Grid View Mobile (3列) */
+    .gallery-container.grid-view { grid-template-columns: repeat(3, 1fr); }
+    /* Process Mobile */
+    .process-gallery { gap: 60px; padding-left: 20px; }
+    .process-gallery::before { left: 20px; }
+    .process-item, .process-item:nth-child(even) { flex-direction: column; align-items: flex-start; margin-left: 30px; }
+    .process-item::after { left: -10px; top: 0; transform: translate(-50%, 0); margin-top: 10px; }
+    .process-images { width: 100%; margin-bottom: 15px; }
+    .process-caption { width: 100%; padding: 0; text-align: left !important; }
+}
